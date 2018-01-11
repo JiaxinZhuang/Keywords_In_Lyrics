@@ -1,14 +1,22 @@
-import Lyrics_Download
 import jieba
 from collections import Counter
 
 class Classifier():
     def __init__(self):
         self.counter = Counter([])
+        self.exclude = ("的","我","你", "了", "（", "）", "~")
 
     def update(self, sentences):
         seg_list = self.chinese_text_segementation(sentences)
+        seg_list = list(filter(self.exclude_not_real_word, seg_list))
         self.counter.update(seg_list)
+
+    def exclude_not_real_word(self, seg):
+        if seg in self.exclude:
+            return False
+        else:
+            return True
+
 
     def most_common(self, num):
         if len(self.counter) >= num:

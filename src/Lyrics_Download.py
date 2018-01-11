@@ -4,6 +4,7 @@ import time
 from collections import defaultdict
 import sqlite3
 import sys
+import ast
 
 headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -95,17 +96,21 @@ class Music():
         params_get_lyrics['id'] = song_id
         soup = self.connect_and_get_respond(self.neteasemusic_song, params = params_get_lyrics, headers = headers)
         body = soup.text
-        temp = eval(body)
-        temp = temp['lyric'].split('\n')
         lyrics = []
-        for item in temp:
-            item = item.split(']')
-            if (len(item)) > 1:
-                item = item[1]
-                if item.find('：') == -1:
-                    lyrics += item.split()
-        #    lyrics += sets
-        print(lyrics)
+
+        #print(body)
+        #print(type(body))
+        if body.find('nolyric') == -1:
+            temp = ast.literal_eval(body)
+            temp = temp['lyric'].split('\n')
+            for item in temp:
+                item = item.split(']')
+                if (len(item)) > 1:
+                    item = item[1]
+                    if item.find('：') == -1:
+                        lyrics += item.split()
+            #    lyrics += sets
+        #print(lyrics)
         print('----------{} end----------'.format(sys._getframe().f_code.co_name))
         return lyrics
 
@@ -124,5 +129,6 @@ class Music():
         print('----------{} end----------'.format(sys._getframe().f_code.co_name))
 
 if __name__=='__main__':
-   music = Music(singer_id=6452)
-   music.get_lyrics_Of_singer()
+    music = Music(singer_id=6452)
+    music.get_lyric_by_song_id(26609713)
+   #music.get_lyrics_Of_singer()
