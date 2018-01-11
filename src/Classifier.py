@@ -4,7 +4,7 @@ from collections import Counter
 class Classifier():
     def __init__(self):
         self.counter = Counter([])
-        self.exclude = ("的","我","你", "了", "（", "）", "~")
+        self.exclude = ("的","我","你", "了", "（", "）", "～", "着", "再", "Oh","啊","却")
 
     def update(self, sentences):
         seg_list = self.chinese_text_segementation(sentences)
