@@ -69,7 +69,7 @@ class Music():
             albums[album_id] = album_name
             print("{}:{}".format(album_id, album_name))
 
-        print('----------{} end----------'.format(sys._getframe().f_code.co_name))
+        print('----------{} end----------\n'.format(sys._getframe().f_code.co_name))
         return albums
 
     def get_song_id_by_album_id(self, album_id):
@@ -87,7 +87,7 @@ class Music():
             songs[song_id] = song_name
             print('{}:{}'.format(song_id, song_name))
 
-        print('----------{} end----------'.format(sys._getframe().f_code.co_name))
+        print('----------{} end----------\n'.format(sys._getframe().f_code.co_name))
         return songs
 
     def get_lyric_by_song_id(self, song_id):
@@ -111,7 +111,7 @@ class Music():
                         lyrics += item.split()
             #    lyrics += sets
         #print(lyrics)
-        print('----------{} end----------'.format(sys._getframe().f_code.co_name))
+        print('----------{} end----------\n'.format(sys._getframe().f_code.co_name))
         return lyrics
 
     def get_lyrics_Of_singer(self):
@@ -125,8 +125,8 @@ class Music():
                 lyrics += self.get_lyric_by_song_id(song_id)
                 time.sleep(5)
                 yield lyrics
-                print('len {}'.format(len(lyrics)))
-        print('----------{} end----------'.format(sys._getframe().f_code.co_name))
+                #print('len {}'.format(len(lyrics)))
+        print('----------{} end----------\n'.format(sys._getframe().f_code.co_name))
 
 if __name__=='__main__':
     music = Music(singer_id=6452)
