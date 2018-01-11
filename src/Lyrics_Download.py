@@ -1,6 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 import time
+from collections import defaultdict
+import sqlite3
+import sys
 
 headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -18,20 +21,108 @@ headers = {
 }
 
 class Music():
-    def __init__(self, singer_id, headers):
-        self.neteasemusic_home_url = "https://music.163.com"
-        self.neteasemusic_album_by_artist = "http://music.163.com/artist/album"
-        self.params_= {:}
-        self.params_ = {:}
-        self.params_ = {:}
-        self.neteasemusic_album = "http://music.163.com/album"
-        self.neteasemusic_song = "http://music.163.com/api/song/media"
-        #self.singer_name = singer_name
+    def __init__(self, singer_id, headers=headers):
         self.headers = headers
         self.singer_id = singer_id
+        self.neteasemusic_home_url = "https://music.163.com"
+        self.neteasemusic_album_by_artist = "http://music.163.com/artist/album"
+        self.neteasemusic_album = "http://music.163.com/album"
+        self.neteasemusic_song = "http://music.163.com/api/song/media"
+        #self.params_get_ablum_id = {id:self.singer_id}
+        #self.params_get_song_id = dict()
+        #self.params_get_lyric = dict()
+        self.database_path = '/tmp/lyrics.sqlite'
+        #self.connect_sqlite3_database()
 
-    def get_singer_id_by_name(self):
-        requests.get(
+        #self.singer_name = singer_name
 
+    #def get_singer_id_by_name(self):
+    #    requests.get(
 
+    #def __del__(self):
+        #self.conn.commit()
+        #self.conn.close()
 
+    def connect_sqlite3_database(self):
+        self.conn = sqlite3.connect(self.database_path)
+        c = self.conn.cursor()
+        return c
+
+    def connect_and_get_respond(self, url, params, headers):
+       respond = requests.get(url, params=params, headers=headers)
+       soup = BeautifulSoup(respond.content.decode(), 'html.parser')
+       return soup
+
+    def get_album_id_by_singer_id(self, singer_id):
+        print('----------{} begin----------'.format(sys._getframe().f_code.co_name))
+        params_get_ablum_id = {'id':singer_id, 'limit':200}
+        soup = self.connect_and_get_respond(self.neteasemusic_album_by_artist, params = params_get_ablum_id, headers = self.headers)
+        body = soup.body
+        sets = body.find_all('div', class_='u-cover u-cover-alb3')
+        # {album_id:album_name}
+        albums = defaultdict()
+
+        for item in sets:
+            album_id = item.find('a').get('href').replace('/album?id=', '')
+            album_name = item.get('title')
+            albums[album_id] = album_name
+            print("{}:{}".format(album_id, album_name))
+
+        print('----------{} end----------'.format(sys._getframe().f_code.co_name))
+        return albums
+
+    def get_song_id_by_album_id(self, album_id):
+        print('----------{} begin----------'.format(sys._getframe().f_code.co_name))
+        params_get_song_id = defaultdict()
+        params_get_song_id['id'] = album_id
+        soup = self.connect_and_get_respond(self.neteasemusic_album, params = params_get_song_id, headers = headers)
+        body = soup.body
+        sets = body.find('ul', attrs={'class': 'f-hide'}).find_all('li')
+        songs = defaultdict()
+
+        for item in sets:
+            song_name = item.getText()
+            song_id = item.a.get('href').replace('/song?id=', '')
+            songs[song_id] = song_name
+            print('{}:{}'.format(song_id, song_name))
+
+        print('----------{} end----------'.format(sys._getframe().f_code.co_name))
+        return songs
+
+    def get_lyric_by_song_id(self, song_id):
+        print('----------{} begin----------'.format(sys._getframe().f_code.co_name))
+        params_get_lyrics = defaultdict()
+        params_get_lyrics['id'] = song_id
+        soup = self.connect_and_get_respond(self.neteasemusic_song, params = params_get_lyrics, headers = headers)
+        body = soup.text
+        temp = eval(body)
+        temp = temp['lyric'].split('\n')
+        lyrics = []
+        for item in temp:
+            item = item.split(']')
+            if (len(item)) > 1:
+                item = item[1]
+                if item.find('：') == -1:
+                    lyrics += item.split()
+        #    lyrics += sets
+        print(lyrics)
+        print('----------{} end----------'.format(sys._getframe().f_code.co_name))
+        return lyrics
+
+    def get_lyrics_Of_singer(self):
+        print('----------{} begin----------'.format(sys._getframe().f_code.co_name))
+        lyrics = []
+        albums = self.get_album_id_by_singer_id(self.singer_id)
+        for album_id, album_name in albums.items():
+            songs = self.get_song_id_by_album_id(album_id)
+            for song_id, song_name in songs.items():
+                print(song_name)
+                lyrics += self.get_lyric_by_song_id(song_id)
+                time.sleep(5)
+                yield lyrics
+                print('len {}'.format(len(lyrics)))
+        print('----------{} end----------'.format(sys._getframe().f_code.co_name))
+
+if __name__=='__main__':
+   music = Music(singer_id=6452)
+   music.get_lyrics_Of_singer()
