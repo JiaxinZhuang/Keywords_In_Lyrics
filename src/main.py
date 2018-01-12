@@ -5,7 +5,7 @@ import time
 
 def classifier_print(top_list):
     index = 1
-    counts_star = 178
+    counts_star = 50
     max_value = max([value for song,value in top_list])
     for (song, value) in top_list:
         if len(song) == 2:
@@ -41,6 +41,6 @@ if __name__=='__main__':
     print('----------Conclusion----------')
     print(singer_name)
     print('## 统计歌曲数目：{}'.format(music.get_songs_size()))
-    print('## top:{} 词（去虚词）'.format(top))
+    print('## top:{} 词（去虚词，代词等无实在意义词）'.format(top))
     classifier_print(classifier.most_common(top))
 
