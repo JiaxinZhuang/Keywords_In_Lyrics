@@ -126,7 +126,7 @@ class Music():
                     if item.find('：') == -1:
                         for exword in replace_symbol:
                             item = item.replace(exword, '')
-                        lyrics.append()
+                        lyrics.append(item)
             #    lyrics += sets
         #print(lyrics)
         print('----------{} end----------\n'.format(sys._getframe().f_code.co_name))
