@@ -16,9 +16,8 @@ class Classifier():
                     word = word.strip()
                     exclude.append(word)
         exclude = set(exclude)
-        print(exclude)
+        #print(exclude)
         self.exclude = exclude
-        #self.exclude = ("谁","人","没有","到","过","一个","多","我","你","他","她","01","02", "的", "了", "[","]","?","（", "）", "(",")", "'", "～", ","," ","着", "再", "Oh","啊","却", "在","是","就","都","而", "里", "~", "也", "那", "喔", "还", "会", "这", "有", "上", "很", "被", "给", "来", "为","只", "不","说", "啦", "让", "咪", "要", ":")
 
     def update(self, sentences):
         seg_list = self.chinese_text_segementation(sentences)
