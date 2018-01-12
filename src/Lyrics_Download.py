@@ -126,7 +126,8 @@ class Music():
                     temp = list(songs)
                     if song_name not in temp:
                         songs[song_id] = song_name
-        with open('./songs.txt', 'w') as f:
+        self.songs_size = len(songs)
+        with open('./songs_of_{}.txt'.format(self.singer_id), 'w') as f:
             for song_id, song_name in songs.items():
                 print(song_name)
                 f.write(song_name+'\n')
@@ -135,6 +136,9 @@ class Music():
                 yield lyrics
                 #print('歌曲数目： {}'.format(len(lyrics)))
         print('----------{} end----------\n'.format(sys._getframe().f_code.co_name))
+
+    def get_songs_size(self):
+        return self.songs_size
 
 if __name__=='__main__':
     music = Music(singer_id=6452)
