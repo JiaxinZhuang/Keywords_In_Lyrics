@@ -126,7 +126,7 @@ class Music():
                     if item.find('：') == -1:
                         for exword in replace_symbol:
                             item = item.replace(exword, '')
-                        lyricsa.append()
+                        lyrics.append()
             #    lyrics += sets
         #print(lyrics)
         print('----------{} end----------\n'.format(sys._getframe().f_code.co_name))
@@ -159,7 +159,7 @@ class Music():
             with open(self.songs_path, 'w') as f:
                 with open(self.database_lyrics, 'wb') as ff:
                     for song_id, song_name in songs.items():
-                        print('{:>3}/{}{:>}{}{}'.format(index, self.songs_size,'='*(int)(index/self.songs_size*length), '>', song_name))
+                        print('{:>3}/{} {:>}{} {}'.format(int(index), self.songs_size,'='*(int)(index/self.songs_size*length), '>', song_name))
                         f.write(song_name+'\n')
                         time.sleep(5)
                         lyric = self.get_lyric_by_song_id(song_id)
