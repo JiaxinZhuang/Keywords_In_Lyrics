@@ -5,6 +5,8 @@ from collections import defaultdict
 import sqlite3
 import sys
 import ast
+import pickle
+import os
 
 headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -22,9 +24,10 @@ headers = {
 }
 
 class Music():
-    def __init__(self, singer_id, headers=headers):
+    def __init__(self, singer_id, singer_name, headers=headers):
         self.headers = headers
         self.singer_id = singer_id
+        self.singer_name = singer_name
         self.neteasemusic_home_url = "https://music.163.com"
         self.neteasemusic_album_by_artist = "http://music.163.com/artist/album"
         self.neteasemusic_album = "http://music.163.com/album"
@@ -32,7 +35,9 @@ class Music():
         #self.params_get_ablum_id = {id:self.singer_id}
         #self.params_get_song_id = dict()
         #self.params_get_lyric = dict()
-        self.database_path = '/tmp/lyrics.sqlite'
+        self.songs_path = '../data/songs_of_{}.txt'.format(self.singer_name)
+        self.database_songs = '../data/songids_of_{}'.format(self.singer_id)
+        self.database_lyrics = '../data/lyrics_of_{}'.format(self.singer_id)
         #self.connect_sqlite3_database()
 
         #self.singer_name = singer_name
@@ -102,6 +107,8 @@ class Music():
         #print(type(body))
         if body.find('nolyric') == -1:
             temp = ast.literal_eval(body)
+            if 'lyric' not in temp.keys():
+                return lyrics
             temp = temp['lyric'].split('\n')
             for item in temp:
                 item = item.split(']')
@@ -118,23 +125,40 @@ class Music():
         print('----------{} begin----------'.format(sys._getframe().f_code.co_name))
         lyrics = []
         songs = defaultdict()
-        albums = self.get_album_id_by_singer_id(self.singer_id)
-        for album_id, album_name in albums.items():
-            song = self.get_song_id_by_album_id(album_id)
-            for song_id, song_name in song.items():
-                if len(song_name.split('(')) == 1:
-                    temp = list(songs)
-                    if song_name not in temp:
-                        songs[song_id] = song_name
+        if os.path.exists(self.database_songs) == False:
+            albums = self.get_album_id_by_singer_id(self.singer_id)
+            for album_id, album_name in albums.items():
+                song = self.get_song_id_by_album_id(album_id)
+                for song_id, song_name in song.items():
+                    if len(song_name.split('(')) == 1:
+                        temp = list(songs)
+                        if song_name not in temp:
+                            songs[song_id] = song_name
+            with open(self.database_songs, 'wb') as f:
+                pickle.dump(songs, f)
+        else:
+            with open(self.database_songs, 'rb') as f:
+                songs = pickle.load(f)
+
         self.songs_size = len(songs)
-        with open('./songs_of_{}.txt'.format(self.singer_id), 'w') as f:
-            for song_id, song_name in songs.items():
-                print(song_name)
-                f.write(song_name+'\n')
-                lyrics = self.get_lyric_by_song_id(song_id)
-                time.sleep(5)
-                yield lyrics
-                #print('歌曲数目： {}'.format(len(lyrics)))
+
+        if os.path.exists(self.database_lyrics) == False:
+            with open(self.songs_path, 'w') as f:
+                with open(self.database_lyrics, 'wb') as ff:
+                    for song_id, song_name in songs.items():
+                        #print(song_name)
+                        f.write(song_name+'\n')
+                        time.sleep(5)
+                        lyric = self.get_lyric_by_song_id(song_id)
+                        lyrics.append(lyric)
+                        yield lyric
+                        #print('歌曲数目： {}'.format(len(lyrics)))
+                    pickle.dump(lyrics, ff)
+        else:
+            with open(self.database_lyrics, 'rb') as f:
+                lyrics = pickle.load(f)
+                for lyric in lyrics:
+                    yield lyric
         print('----------{} end----------\n'.format(sys._getframe().f_code.co_name))
 
     def get_songs_size(self):

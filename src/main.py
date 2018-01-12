@@ -5,8 +5,13 @@ import time
 
 def classifier_print(top_list):
     index = 1
+    counts_star = 178
+    max_value = max([value for song,value in top_list])
     for (song, value) in top_list:
-        print('### Top {}:{}; ###### COUNT:{}'.format(index, song, value))
+        if len(song) == 2:
+            print('### Top {: >2}:{:^5}; {}{} COUNT:{}'.format(index, song, '='*((int)(float(value/max_value)*counts_star)),'>',  value))
+        else:
+            print('### Top {: >2}:{:^6}; {}{} COUNT:{}'.format(index, song, '='*((int)(float(value/max_value)*counts_star)),'>',  value))
         index = index + 1
 
 
@@ -18,7 +23,7 @@ if __name__=='__main__':
     singer_id = int(sys.argv[2])
     top = 50
     classifier = Classifier()
-    music = Music(singer_id=6452)
+    music = Music(singer_id=singer_id, singer_name=singer_name)
     get_lyric = music.get_lyrics_Of_singer()
     start = time.clock()
     while True:
