@@ -105,16 +105,23 @@ class Music():
 
         #print(body)
         #print(type(body))
+
+        replace_symbol = ['-','…','\'','"','~',',','，','.','。','?','？',':',
+'：','!','！','[',']','（','）','(', ')']
+
         if body.find('nolyric') == -1:
             temp = ast.literal_eval(body)
             if 'lyric' not in temp.keys():
                 return lyrics
             temp = temp['lyric'].split('\n')
             for item in temp:
+                item.strip()
                 item = item.split(']')
                 if (len(item)) > 1:
-                    item = item[1]
+                    item = item[-1]
                     if item.find('：') == -1:
+                        for exword in replace_symbol:
+                            item = item.replace(exword, '')
                         lyrics += item.split()
             #    lyrics += sets
         #print(lyrics)

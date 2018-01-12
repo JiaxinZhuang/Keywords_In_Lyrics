@@ -16,12 +16,12 @@ def classifier_print(top_list):
 
 
 if __name__=='__main__':
-    if len(sys.argv) != 3:
-        print('Parameter must include singer name and id')
+    if len(sys.argv) != 4:
+        print('Parameter must include singer name and id and top num')
         sys.exit(-1)
     singer_name = sys.argv[1]
     singer_id = int(sys.argv[2])
-    top = 50
+    top = int(sys.argv[3])
     classifier = Classifier()
     music = Music(singer_id=singer_id, singer_name=singer_name)
     get_lyric = music.get_lyrics_Of_singer()
@@ -30,9 +30,9 @@ if __name__=='__main__':
         try:
             sentences = next(get_lyric)
             classifier.update(sentences)
-            print('\ntop:{}'.format(top))
-            print(classifier.most_common(top))
-            print('\n')
+            #print('\ntop:{}'.format(top))
+            #print(classifier.most_common(top))
+            #print('\n')
         except StopIteration:
             print('No songs any more')
             break
