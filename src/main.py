@@ -6,6 +6,7 @@ if __name__=='__main__':
     classifier = Classifier()
     music = Music(singer_id=6452)
     get_lyric = music.get_lyrics_Of_singer()
+    index = 1
     while True:
         try:
             sentences = next(get_lyric)
@@ -13,9 +14,12 @@ if __name__=='__main__':
             print('\ntop:{}'.format(top))
             print(classifier.most_common(top))
             print('\n')
+            index = index + 1
         except StopIteration:
             print('No songs any more')
             break
-    #print('top:{}'.format(top))
-    #print(Classifier.most_common(top))
+    print('----------Conclusion----------')
+    print('## 统计歌曲数目：{}'.format(index))
+    print('## top:{} 词（去虚词代词）'.format(top))
+    print('## {}'.format(classifier.most_common(top)))
 

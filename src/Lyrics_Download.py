@@ -117,18 +117,26 @@ class Music():
     def get_lyrics_Of_singer(self):
         print('----------{} begin----------'.format(sys._getframe().f_code.co_name))
         lyrics = []
+        songs = defaultdict()
         albums = self.get_album_id_by_singer_id(self.singer_id)
         for album_id, album_name in albums.items():
-            songs = self.get_song_id_by_album_id(album_id)
+            song = self.get_song_id_by_album_id(album_id)
+            for song_id, song_name in song.items():
+                if len(song_name.split('(')) == 1:
+                    temp = list(songs)
+                    if song_name not in temp:
+                        songs[song_id] = song_name
+        with open('./songs.txt', 'w') as f:
             for song_id, song_name in songs.items():
                 print(song_name)
-                lyrics += self.get_lyric_by_song_id(song_id)
+                f.write(song_name+'\n')
+                lyrics = self.get_lyric_by_song_id(song_id)
                 time.sleep(5)
                 yield lyrics
-                #print('len {}'.format(len(lyrics)))
+                #print('歌曲数目： {}'.format(len(lyrics)))
         print('----------{} end----------\n'.format(sys._getframe().f_code.co_name))
 
 if __name__=='__main__':
     music = Music(singer_id=6452)
-    music.get_lyric_by_song_id(26609713)
-   #music.get_lyrics_Of_singer()
+    #music.get_lyric_by_song_id(26609713)
+    music.get_lyrics_Of_singer()
